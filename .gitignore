@@ -1,0 +1,22 @@
+/database
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+.venv/git
+venv/
+
+# Environment variables
+.env
+
+# IDE files
+.vscode/
+.idea/
+
+# macOS system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
