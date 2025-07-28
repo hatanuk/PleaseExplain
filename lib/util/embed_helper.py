@@ -1,9 +1,5 @@
 import discord
-try:
-    import eng_to_ipa
-    ENG_TO_IPA_AVAILABLE = True
-except ImportError:
-    ENG_TO_IPA_AVAILABLE = False
+import eng_to_ipa
 from lib.util.validation import Validator
 
 
@@ -23,16 +19,10 @@ def create_def_embed(url, creator, requestor, created_at, updated_at):
 
 def create_term_embed(term, definition, creator, created_at, updated_at, image):
     created_at, updated_at = created_at[:10], updated_at[:10]
-    
-    # Only use phonetics if eng_to_ipa is available
-    phonetics = None
-    if ENG_TO_IPA_AVAILABLE:
-        try:
-            phonetics = eng_to_ipa.convert(term)
-            if "*" in list(phonetics):
-                phonetics = None
-        except Exception:
-            phonetics = None
+    phonetics = eng_to_ipa.convert(term)
+
+    if "*" in list(phonetics):
+        phonetics = None
     # -------
     # Creating the embed
     embed = discord.Embed(title=term, description=definition,

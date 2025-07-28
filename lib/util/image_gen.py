@@ -1,30 +1,15 @@
 import textwrap
 from random import choice
 
-try:
-    from PIL import Image, ImageFont, ImageDraw
-    PIL_AVAILABLE = True
-except ImportError:
-    PIL_AVAILABLE = False
-    print("Warning: PIL (Pillow) not installed. Image generation features will be disabled.")
+from PIL import Image, ImageFont, ImageDraw
 
-try:
-    import eng_to_ipa
-    ENG_TO_IPA_AVAILABLE = True
-except ImportError:
-    ENG_TO_IPA_AVAILABLE = False
-    print("Warning: eng_to_ipa not installed. Phonetic features will be disabled.")
+import eng_to_ipa
+import nltk
 
-try:
-    import nltk
-    nltk.download('averaged_perceptron_tagger_eng', quiet=True)
-    nltk.download('punkt', quiet=True)
-    from nltk import pos_tag
-    from nltk.tokenize import word_tokenize
-    NLTK_AVAILABLE = True
-except ImportError:
-    NLTK_AVAILABLE = False
-    print("Warning: nltk not installed. Advanced text processing will be disabled.")
+nltk.download('averaged_perceptron_tagger_eng')
+nltk.download('punkt')
+from nltk import pos_tag
+from nltk.tokenize import word_tokenize
 
 
 def scale_font(text, font, image, percent):
