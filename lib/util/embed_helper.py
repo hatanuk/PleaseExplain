@@ -1,12 +1,11 @@
 import discord
 import eng_to_ipa
-from lib.util.validation import Validator
 
 
 def create_def_embed(url, creator, requestor, created_at, updated_at):
 
-    creator_name, creator_avatar = Validator.get_name_and_avatar(creator)
-    requestor_name, _ = Validator.get_name_and_avatar(requestor)
+    creator_name, creator_avatar = _get_name_and_avatar(creator)
+    requestor_name, _ = _get_name_and_avatar(requestor)
 
     created_at, updated_at = created_at[:10], updated_at[:10]
     embed = discord.Embed(title="Requested by " + requestor_name,
@@ -46,3 +45,9 @@ def create_dict_embed(values, creators, page, max_pages, total):
         embed.add_field(name=str(value), value="by " + creator.name, inline=True)
 
     return embed
+
+
+def _get_name_and_avatar(user):
+        name = user.name if isinstance(user, discord.User) else "unknown"
+        avatar = user.display_avatar if isinstance(user, discord.User) else discord.User.default_avatar
+        return name, avatar

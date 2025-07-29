@@ -17,9 +17,3 @@ class Validator:
                 return index
         return False
 
-
-    @staticmethod
-    def get_name_and_avatar(user):
-        name = user.name if isinstance(user, discord.User) else "unknown"
-        avatar = user.display_avatar if isinstance(user, discord.User) else discord.User.default_avatar
-        return name, avatar
