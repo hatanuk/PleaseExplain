@@ -1,10 +1,11 @@
 import discord
 import datetime
-import 
+import importlib
 from discord.ext import commands
 from discord import app_commands
 
 import lib.data.datalib as db
+import lib.util
 from lib.data.datalib import MAX_TERMS
 from lib.util.image_gen import create_def_image, create_dictionary_image
 from lib.util.validation import Validator
@@ -148,7 +149,7 @@ class Base(commands.Cog):
         TERMS_PER_PAGE = 18
 
         # Fetching from DB
-        values = db.fetch(["TermName", "CreatorID"], "TermDB", interaction.guild.id)
+        values = db.fetch_all_terms(interaction.guild.id)
 
         if values is None:
             await interaction.response.send_message(

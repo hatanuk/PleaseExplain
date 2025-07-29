@@ -10,6 +10,9 @@ cur = con.cursor()
 
 # - PUBLIC -
 
+def fetch_all_terms(guild_id):
+    return _fetch(["TermName", "CreatorID"], "TermDB", guild_id)
+
 
 def fetch_term(guild_id, term):
     result = _fetch(["TermName", "TermDefinition", "CreatorID", "CreatedAt", "UpdatedAt", "TermImage"], "TermDB",
