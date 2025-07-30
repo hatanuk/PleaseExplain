@@ -31,10 +31,20 @@ class Debug(commands.Cog):
     @commands.is_owner()
     async def reload_all(self, ctx):
         try:
+            self.bot.reload_utils()
             await self.bot.reload_cogs()
             await ctx.send(f"yes king")
         except Exception as e:
-            await ctx.send(f"Failed")
+            await ctx.send(f"Failed: {e}")
+
+    @commands.command(name="reload_utils")
+    @commands.is_owner()
+    async def reload_utils(self, ctx):
+        try:
+            self.bot.reload_utils()
+            await ctx.send(f"yes king")
+        except Exception as e:
+            await ctx.send(f"Failed: {e}")
 
     @commands.command(name="global_sync")
     @commands.is_owner()
@@ -45,5 +55,16 @@ class Debug(commands.Cog):
     @commands.command(name="local_sync")
     @commands.is_owner()
     async def local_sync(self, ctx):
+        self.bot.tree.clear_commands(guild=ctx.guild)
+        print('sync1')
+        await self.bot.tree.sync(guild=ctx.guild)
+        self.bot.tree.copy_global_to(guild=ctx.guild)
+        print('sync2')
         await self.bot.tree.sync(guild=ctx.guild)
         await ctx.send(f"yes king")
+
+    @commands.command(name="log_cmds")
+    @commands.is_owner()
+    async def log_cmds(self, ctx):
+        cmds = self.bot.tree.get_commands()
+        await ctx.send([cmd.name for cmd in cmds if isinstance(cmd, discord.app_commands.Command)])

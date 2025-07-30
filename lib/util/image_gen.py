@@ -60,16 +60,13 @@ def create_dictionary_image(term, definition):
         phonetics = None
 
 
-    FLAVOR_TEXT = ["Hey, it's in the dictionary!",
+    FLAVOR_TEXT = [
                    "No, it's not legal in Scrabble. ",
                    "You are welcome.",
-                   "Eat. Sleep. Define. Explain. Repeat.",
-                   "Making sense of your alphabet soup.",
-                   "Your daily dose of diction.",
                    "Don't Google that.",
-                   "For the verbally voracious.",
-                   "Your lexicon lifeline.",
-                   "I didn't even know that was a word."
+                   "Hilarious.",
+                   "Very true!",
+                   "You made that up, didn't you? Haha.. that's the point..."
                    ]
 
     OUTPUT_PATH = "lib/data/image_data/image_cache/output.png"
@@ -114,8 +111,7 @@ def create_dictionary_image(term, definition):
     # Draw the footer
     draw.text((15, 275), "@ PleaseExplain", fill=footer_color, font=footer_font)
 
-    # Save the image
-    image.save(OUTPUT_PATH)
+    return image
 
 
 #

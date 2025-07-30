@@ -11,10 +11,14 @@ cur = con.cursor()
 # - PUBLIC -
 
 def fetch_all_terms(guild_id):
-    return _fetch(["TermName", "CreatorID"], "TermDB", guild_id)
+    """Returns: [TermName, TermDefinition, CreatorID, CreatedAt, UpdatedAt, TermImage]"""
+
+    return _fetch(["TermName", "TermDefinition", "CreatorID", "CreatedAt", "UpdatedAt", "TermImage"], "TermDB", guild_id)
 
 
 def fetch_term(guild_id, term):
+    """Returns: TermName, TermDefinition, CreatorID, CreatedAt, UpdatedAt, TermImage"""
+
     result = _fetch(["TermName", "TermDefinition", "CreatorID", "CreatedAt", "UpdatedAt", "TermImage"], "TermDB",
                     guild_id, term)
     if not result:

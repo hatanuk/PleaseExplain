@@ -14,6 +14,7 @@ intents.guilds = True
 
 COG_DIR = "lib/cogs"
 UTIL_DIR = "lib/util"
+DB_LIB_PATH = "lib/data/datalib"
 
 class Bot(commands.Bot):
     def __init__(self, *args, **kwargs):
@@ -35,6 +36,9 @@ class Bot(commands.Bot):
         for submodule in submodules:
             submodule = sys.modules.get(submodule)
             importlib.reload(submodule)
+        db_lib = sys.modules.get(DB_LIB_PATH.replace("/", "."))
+        importlib.reload(db_lib)
+        
 
     async def reload_cogs(self):
         for filename in os.listdir(COG_DIR):
