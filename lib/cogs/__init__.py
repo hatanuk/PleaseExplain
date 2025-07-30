@@ -1,1 +1,1 @@
-from . import base, debug
+from . import base, debug, fun

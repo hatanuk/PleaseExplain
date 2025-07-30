@@ -1,5 +1,6 @@
 import textwrap
 from random import choice
+import re
 
 from PIL import Image, ImageFont, ImageDraw
 
@@ -7,7 +8,7 @@ import eng_to_ipa
 import nltk
 
 nltk.download('averaged_perceptron_tagger_eng')
-nltk.download('punkt')
+nltk.download('universal_tagset')
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize
 
@@ -92,11 +93,13 @@ def create_dictionary_image(term, definition):
     draw.text((20, 20), term, fill=title_color, font=title_font)
 
     # Take out characters that are invisible in the phonetics font
-    phonetics = clean_term(term)
+    phonetics = _clean_term(term)
 
     part_of_speech = get_part_of_speech(term)
     draw.text((20, 49), "[" + phonetics + "]", fill=phonetics_color, font=phonetic_font)
-    draw.text((25 + phonetic_font.getbbox("[" + phonetics + "]")[0], 50), " |  " + part_of_speech, fill=phonetics_color,
+    
+    if part_of_speech is not None:
+        draw.text((25 + phonetic_font.getlength("[" + phonetics + "]"), 50), " |  " + part_of_speech, fill=phonetics_color,
               font=text_font)
 
     # Wrap the definition text if it's too long
@@ -114,42 +117,54 @@ def create_dictionary_image(term, definition):
     return image
 
 
-#
 
 def get_part_of_speech(word):
     # Tokenize the word
     tokenized_word = word_tokenize(word)
+    print(tokenized_word)
 
     # Get the part of speech tag
-    pos_tagged_word = pos_tag(tokenized_word)
+    pos_tagged_word = pos_tag(tokenized_word, tagset='universal')
 
     # Get the pos code from the first tuple of the list (first word passed)
     # eg. [("run", "VR")] is what's returned
     pos_tag_code = pos_tagged_word[0][1]
+    print(pos_tag_code)
 
-    pos_dict = {"J": "adjective",
-                "N": "noun",
-                "V": "verb",
-                "R": "adverb",
-                "I": "preposition",
-                "C": "conjunction",
-                "P": "pronoun",
-                "M": "modal",
-                "D": "determiner",
-                "E": "existential",
-                "F": "foreign word",
-                "L": "list marker",
-                "T": "preposition",
-                "U": "interjection",
-                "W": "interrogative"}
+    pos_dict =  {"NOUN": "noun",
+    "VERB": "verb",
+    "ADJ": "adjective",
+    "ADV": "adverb",
+    "PRON": "pronoun",
+    "DET": "determiner",
+    "ADP": "adposition", 
+    "NUM": "numeral",
+    "CONJ": "conjunction",
+    "PRT": "particle",
+    "INTJ": "interjection",   
+    "X": "foreign word",    
+    "." : "punctuation"
+    }
 
-    return pos_dict.get(pos_tag_code[0], "noun")
+    return pos_dict.get(pos_tag_code, None)
 
 
-def clean_term(term):
-    new_term = []
-    for char in list(term.lower()):
-        if char != "q" and char != "w" and char != "x":
-            new_term.append(char)
+def _clean_term(term):
+    new_term = _collapse_repeats(
+        _sub_non_phonetics(
+            _strip_non_alphanum(term.lower())))
 
-    return "".join(new_term)
+    return new_term
+
+def _strip_non_alphanum(s):
+    return re.sub(r'[^a-zA-Z0-9]', '', s)
+
+def _sub_non_phonetics(s):
+    # q, w and x are invisible in the font face
+    s = re.sub(r'q', 'k', s)
+    s = re.sub(r'x', 'ks', s)
+    s = re.sub(r'w', 'u', s)
+    return(s)
+
+def _collapse_repeats(s):
+    return re.sub(r'(.)\1+', r'\1', s)

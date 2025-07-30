@@ -4,6 +4,7 @@ import lib.data.datalib as db
 from lib.util.image_gen import create_dictionary_image
 from lib.util.cache_helper import cache_image, uncache_image
 from lib.util.embed_helper import create_def_embed
+from lib.util.api_helper import get_user_from_id
 
 from discord.ext import commands
 from discord import app_commands
@@ -24,7 +25,6 @@ class Fun(commands.Cog):
     @app_commands.command(name="random", description="samples a random quote from the server's dictionary" )
     async def random(self, interaction: discord.Interaction):
 
-
         result = db.fetch_all_terms(interaction.guild.id)
 
         if result is None:
@@ -32,14 +32,15 @@ class Fun(commands.Cog):
                 f"I can't find any terms in your server dictionary. have you tried using `/define`?")
             return
         
-        
         sampled = random.sample(result, 1)[0]
         term, definition, creator_id, created_at, updated_at, *_ = sampled
+
+        creator = await get_user_from_id(interaction.client, creator_id)
         requestor = interaction.user
+
         image = create_dictionary_image(term, definition)
-        print(image)
         file, url = cache_image(image, interaction.guild.id, requestor.id)
-        embed = create_def_embed(url, creator_id, requestor.id, created_at, updated_at)
+        embed = create_def_embed(url, creator, requestor, created_at, updated_at)
         await interaction.response.send_message(embed=embed, file=file)
         uncache_image(interaction.guild.id, requestor.id)
 

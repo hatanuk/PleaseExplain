@@ -11,7 +11,7 @@ from lib.util.cache_helper import cache_image, uncache_image
 from lib.util.image_gen import create_def_image, create_dictionary_image
 from lib.util.validation import Validator
 from lib.util.embed_helper import create_def_embed, create_term_embed, create_dict_embed
-
+from lib.util.api_helper import get_user_from_id
 
 async def setup(bot):
     await bot.add_cog(Base(bot))
@@ -36,12 +36,9 @@ class Base(commands.Cog):
                 "all available terms!")
             return
         
-        term, definition, creatorid, created_at, updated_at, image = result
+        term, definition, creator_id, created_at, updated_at, image = result
 
-        # Fetching the creator & requestor
-        creator = interaction.client.get_user(creatorid)
-        if creator is None:
-            creator = await interaction.client.fetch_user(creatorid)
+        creator = await get_user_from_id(interaction.client, creator_id)
         requestor = interaction.user
 
         # await create_def_image(term)
@@ -55,7 +52,7 @@ class Base(commands.Cog):
     async def define(self, interaction: discord.Interaction, term: str, definition: str, image: str = None):
 
         MIN_DEF_LENGTH = 3
-        MAX_DEF_LENGTH = 500
+        MAX_DEF_LENGTH = 250
         MAX_TERM_LENGTH = 15
 
         # String validation
@@ -169,7 +166,7 @@ class Base(commands.Cog):
                 f"invalid page number. this server's dictionary contains `{max_pages}` {'page' if max_pages == 1 else 'pages'}, by the way.")
             return
         # Creating list of user objects
-        creators = []
+        creator_users = []
         creator_cache = {}
         target_values = []
 
@@ -181,16 +178,14 @@ class Base(commands.Cog):
             term_name, _, creator_id, _, _, _ = value
             target_values.append(term_name)
             # cache id : user object pairs in dictionary to prevent duplicate fetching
-            if creator_id not in creator_cache.keys():
-                creator = interaction.client.get_user(creator_id)
-                if creator is None:
-                    creator = await interaction.client.fetch_user(creator_id)
+            if creator_id not in creator_cache:
+                creator = get_user_from_id(interaction.client, creator_id)
                 creator_cache[creator_id] = creator
             else:
                 creator = creator_cache[creator_id]
-            creators.append(creator)
+            creator_users.append(creator)
 
         # Creating embed
         total_results = len(result)
-        embed = create_dict_embed(target_values, creators, page, max_pages, total_results)
+        embed = create_dict_embed(target_values, creator_users, page, max_pages, total_results)
         await interaction.response.send_message(embed=embed)

@@ -4,6 +4,7 @@ import importlib
 from discord.ext import commands
 import lib.data.datalib as db
 import os
+import lib.util
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -27,17 +28,19 @@ class Bot(commands.Bot):
     async def on_ready(self):
         self.build_db()
 
-        print("Commands loaded:")
-        for cmd in bot.commands:
-            print(cmd.name)
-
     def reload_utils(self): 
+
+        # Reload util __init__
+        importlib.reload(lib.util)
+
+        # Reload all util submodules
         submodules = [submodule for submodule in sys.modules if submodule.startswith(UTIL_DIR.replace("/", ".") + ".")]
         for submodule in submodules:
             submodule = sys.modules.get(submodule)
             importlib.reload(submodule)
-        db_lib = sys.modules.get(DB_LIB_PATH.replace("/", "."))
-        importlib.reload(db_lib)
+
+        # Reload datalib as well
+        importlib.reload(db)
         
 
     async def reload_cogs(self):

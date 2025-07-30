@@ -34,7 +34,7 @@ def fetch_term_count(term: str, guildid: str):
 def insert_definition(term: str, definition: str, userid: int, guildid: int, time: str, image=None):
     # Check TOTAL count of server terms
     term_count = _one_record("SELECT COUNT(*) FROM TermDB WHERE GuildID = (?)", guildid)
-    if len(term_count) > 0 and term_count[0] > MAX_TERMS:
+    if term_count > 0 and term_count > MAX_TERMS:
         return "full"
 
     # Check if there exists an equivalent term in the database
