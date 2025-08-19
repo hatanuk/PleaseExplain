@@ -56,10 +56,8 @@ class Debug(commands.Cog):
     @commands.is_owner()
     async def local_sync(self, ctx):
         self.bot.tree.clear_commands(guild=ctx.guild)
-        print('sync1')
         await self.bot.tree.sync(guild=ctx.guild)
         self.bot.tree.copy_global_to(guild=ctx.guild)
-        print('sync2')
         await self.bot.tree.sync(guild=ctx.guild)
         await ctx.send(f"yes king")
 

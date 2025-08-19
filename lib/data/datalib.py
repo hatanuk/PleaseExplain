@@ -10,6 +10,11 @@ cur = con.cursor()
 
 # - PUBLIC -
 
+def set_monitoring(guild_id, on: bool):
+    value = 1 if on else 0
+    _update_config(guild_id, "MonitoringOn", value)
+
+
 def fetch_all_terms(guild_id):
     """Returns: [TermName, TermDefinition, CreatorID, CreatedAt, UpdatedAt, TermImage]"""
 
@@ -60,7 +65,23 @@ def remove_term(term: str, guildid:str):
         return False
 
 
+def clear_usage_data(guild_id):
+    _execute("UPDATE TermDB SET UsageCount = NULL WHERE GuildID = ?", guild_id)
+    set_monitoring(guild_id, on=False)
+
+
+def clear_dictionary_data(guild_id):
+    _execute("DELETE FROM TermDB WHERE GuildID = ?", guild_id)
+
+
+def clear_all_data(guild_id):
+    clear_dictionary_data(guild_id)
+
+
 # - PRIVATE - 
+
+def _update_config(guild_id, category, value):
+    _execute(f"UPDATE ConfigDB SET {category} = ? WHERE GuildId = ?", value, guild_id)
 
 def _with_commit(func):
     def wrapper(*args, **kwargs):
@@ -183,7 +204,6 @@ def build(guild_ids):
     
     );""".format("DiscordServers"))
 
-    # Message DB for each guild
     _execute("""CREATE TABLE IF NOT EXISTS {}(
     TermID integer PRIMARY KEY AUTOINCREMENT,
     GuildID integer,
@@ -193,6 +213,11 @@ def build(guild_ids):
     CreatorID integer,
     CreatedAt text,
     UpdatedAt text,
-    TermImage blob
-    
+    TermImage blob,
+    UsageCount integer
     );""".format("TermDB"))
+
+    _execute("""CREATE TABLE IF NOT EXISTS {}(
+    GuildID integer,
+    MonitoringOn bit
+    );""".format("ConfigDB"))
