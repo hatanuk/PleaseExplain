@@ -18,7 +18,6 @@ def scale_font(text, font, image, percent):
     DECREMENT = 1
 
     max_width = int((percent / 100) * image.width)
-    print(max_width)
 
     while font.getbbox(text)[0] > max_width:
         if font.size < MIN_SIZE:
@@ -113,9 +112,8 @@ def create_dictionary_image(term, definition, usage_count):
     draw.text((15, 275), "@ PleaseExplain", fill=footer_color, font=footer_font)
 
     # drawing usage counter
-    print(usage_count)
     if isinstance(usage_count, int):
-        usage_count_text = f"{usage_count:,}"
+        usage_count_text = f"Times used: {usage_count:,}"
         text_width = footer_font.getlength(usage_count_text)
         draw.text((400 - (text_width + 25), 275), usage_count_text, fill=counter_color, font=footer_font)
 
@@ -126,7 +124,6 @@ def create_dictionary_image(term, definition, usage_count):
 def get_part_of_speech(word):
     # Tokenize the word
     tokenized_word = word_tokenize(word)
-    print(tokenized_word)
 
     # Get the part of speech tag
     pos_tagged_word = pos_tag(tokenized_word, tagset='universal')
@@ -134,7 +131,6 @@ def get_part_of_speech(word):
     # Get the pos code from the first tuple of the list (first word passed)
     # eg. [("run", "VR")] is what's returned
     pos_tag_code = pos_tagged_word[0][1]
-    print(pos_tag_code)
 
     pos_dict =  {"NOUN": "noun",
     "VERB": "verb",

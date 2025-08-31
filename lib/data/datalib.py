@@ -59,7 +59,7 @@ def fetch_term(guild_id, term):
     
 
 def fetch_term_count(term: str, guildid: str):
-    return _one_record("SELECT COUNT(*) FROM TermDB WHERE TermNameLower = (?) AND GuildID = (?)", term.lower(), guildid)[0]
+    return _one_record("SELECT COUNT(*) FROM TermDB WHERE TermNameLower = (?) AND GuildID = (?)", term.lower(), guildid)
 
     
 def insert_definition(term: str, definition: str, userid: int, guildid: int, time: str, image=None):
@@ -98,6 +98,9 @@ def clear_usage_data(guild_id):
 
 def clear_dictionary_data(guild_id):
     _execute("DELETE FROM TermDB WHERE GuildID = ?", guild_id)
+
+def clear_config_data(guild_id):
+    _execute("DELETE FROM ConfigDB WHERE GuildID = ?", guild_id)
 
 
 def clear_all_data(guild_id):
@@ -156,7 +159,6 @@ def _column(command, *values):
     for item in cur.fetchall():
         columns.append(item[0])
 
-    print(columns)
     return columns
 
 
@@ -263,9 +265,8 @@ def build(guild_ids):
 def _insert_default_config(guild_id):
 
     # Monitoring ON by default
-    _execute(
-        "INSERT INTO ConfigDB (GuildID, TypeID, Value) VALUES (?, ?, ?) ",
-        (guild_id, 1, 1)
+    _update_config(
+        guild_id, "1", 1
     )
 
 
@@ -274,3 +275,4 @@ def on_guild_join(guild_id):
 
 def on_guild_remove(guild_id):
     clear_all_data(guild_id)
+    clear_config_data(guild_id)

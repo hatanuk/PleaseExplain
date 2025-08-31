@@ -33,12 +33,12 @@ class Fun(commands.Cog):
             return
         
         sampled = random.sample(result, 1)[0]
-        term, definition, creator_id, created_at, updated_at, *_ = sampled
+        term, definition, creator_id, created_at, updated_at, _, usage_count = sampled
 
         creator = await get_user_from_id(interaction.client, creator_id)
         requestor = interaction.user
 
-        image = create_dictionary_image(term, definition)
+        image = create_dictionary_image(term, definition, usage_count)
         file, url = cache_image(image, interaction.guild.id, requestor.id)
         embed = create_def_embed(url, creator, requestor, created_at, updated_at)
         await interaction.response.send_message(embed=embed, file=file)

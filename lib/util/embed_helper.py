@@ -15,13 +15,10 @@ def create_config_embed(configs):
     embed = discord.Embed(title="my configurations!",
                           color=0x006eb3)
     
-    print(configs)
-    
     if not configs:
         embed.add_field(name="no configs found", value="sorry about that")
     else:
         for config in configs:
-            print(config)
             value, type_id = config
 
             info = config_type_to_info(type_id)

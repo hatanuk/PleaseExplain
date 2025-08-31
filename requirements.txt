@@ -1,2 +1,4 @@
 packaging==24.2
 wheel
+discord.py
+Pillow

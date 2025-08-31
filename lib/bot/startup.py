@@ -27,11 +27,8 @@ class Bot(commands.Bot):
         await self.reload_cogs()
 
     async def on_ready(self):
-        print("RADDADNADNE")
         self.build_db()
         self.usage_counter.setup(self.guilds)
-        print("ready")
-        print(self.usage_counter)
 
     def reload_utils(self): 
 

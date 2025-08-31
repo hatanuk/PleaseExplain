@@ -4,7 +4,6 @@ from discord import app_commands
 from discord import SelectOption
 
 
-
 async def setup(bot):
     await bot.add_cog(Debug(bot))
 
@@ -34,6 +33,16 @@ class Debug(commands.Cog):
             self.bot.reload_utils()
             await self.bot.reload_cogs()
             await ctx.send(f"yes king")
+        except Exception as e:
+            await ctx.send(f"Failed: {e}")
+
+    @commands.command(name="unsync")
+    @commands.is_owner()
+    async def unsync(self, ctx):
+        try:
+            self.bot.tree.clear_commands(guild=None)
+            await self.bot.tree.sync(guild=None)
+            await ctx.send("all global slash commands have been unsynced")
         except Exception as e:
             await ctx.send(f"Failed: {e}")
 

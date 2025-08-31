@@ -25,19 +25,20 @@ class Base(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_guild_join(guild):
+    async def on_guild_join(self, guild):
         db.on_guild_join(guild.id)
 
     @commands.Cog.listener()
-    async def on_guild_remove(guild):
+    async def on_guild_remove(self, guild):
         db.on_guild_remove(guild.id)
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        guild_id = message.guild.id
 
-        if not guild_id:
-            return
+        if not message.guild:
+            return 
+        
+        guild_id = message.guild.id
 
         if not db.is_monitoring_on(guild_id):
             return
@@ -47,14 +48,11 @@ class Base(commands.Cog):
         words = message.content.split()
 
         for word in words:
-            print(word)
             if word in self.bot.usage_counter.cache[guild_id].keys():
                 self.bot.usage_counter.cache[guild_id][word] += 1
-                print(f"yeah: {self.bot.usage_counter.cache[guild_id][word]}")
                 break
         
         if self.bot.usage_counter.to_refresh[guild_id] >= self.bot.usage_counter.REFRESH_RATE:
-            print("REFRESH")
             self.bot.usage_counter.refresh(guild_id)
 
         
@@ -72,7 +70,6 @@ class Base(commands.Cog):
             return
         
         term, definition, creator_id, created_at, updated_at, image, usage_count = result
-        print(f"usage_count: {usage_count}")
 
         creator = await get_user_from_id(interaction.client, creator_id)
         requestor = interaction.user
@@ -140,7 +137,7 @@ class Base(commands.Cog):
     @app_commands.command(name="undefine", description="removes a definition from your server dictionary")
     async def undefine(self, interaction: discord.Interaction, term: str):
         guild_id = str(interaction.guild.id)
-        if db.get_term_count(term, guild_id) < 1:
+        if db.fetch_term_count(term, guild_id) < 1:
             await interaction.response.send_message(
                 "sorry, I could not find that term in this server. \nplease do `/dictionary` to see all avaliable "
                 "terms!")
@@ -190,7 +187,7 @@ class Base(commands.Cog):
         end_index = TERMS_PER_PAGE * page
 
         for value in result[start_index:end_index]:
-            term_name, _, creator_id, _, _, _ = value
+            term_name, _, creator_id, *_ = value
             target_values.append(term_name)
             # cache id : user object pairs in dictionary to prevent duplicate fetching
             if creator_id not in creator_cache:
