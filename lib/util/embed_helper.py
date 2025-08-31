@@ -2,6 +2,35 @@ import discord
 import eng_to_ipa
 
 
+def config_type_to_info(type_id):
+    match type_id:
+        case 1:
+            return ["usage_counting", "whether I can monitor messages to count the usage of terms"]
+        case _:
+            return ["unknown_config", "you are not supposed to see this"]
+
+
+def create_config_embed(configs):
+
+    embed = discord.Embed(title="my configurations!",
+                          color=0x006eb3)
+    
+    print(configs)
+    
+    if not configs:
+        embed.add_field(name="no configs found", value="sorry about that")
+    else:
+        for config in configs:
+            print(config)
+            value, type_id = config
+
+            info = config_type_to_info(type_id)
+
+            name = info[0] + " - ✅" if value == 1 else info[0] + " - ❌"
+            desc = info[1]
+            embed.add_field(name=name, value=desc, inline=True)
+    return embed
+
 def create_def_embed(url, creator, requestor, created_at, updated_at):
 
     creator_name, creator_avatar = _get_name_and_avatar(creator)
@@ -11,7 +40,6 @@ def create_def_embed(url, creator, requestor, created_at, updated_at):
     embed = discord.Embed(title="Requested by " + requestor_name,
                           color=0x006eb3)
     
-    print(url)
     embed.set_image(url=url)
     embed.set_footer(text=f"author: {creator_name}\ncreated at: {created_at}; updated at: {updated_at}",
                      icon_url=creator_avatar)

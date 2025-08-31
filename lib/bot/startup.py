@@ -5,10 +5,10 @@ from discord.ext import commands
 import lib.data.datalib as db
 import os
 import lib.util
+from lib.util.cache_helper import UsageCounter
 
 intents = discord.Intents.default()
 intents.message_content = True
-intents.presences = False
 intents.typing = False
 intents.messages = True
 intents.guilds = True
@@ -20,13 +20,18 @@ DB_LIB_PATH = "lib/data/datalib"
 class Bot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.usage_counter = UsageCounter()
 
     async def setup_hook(self):
         self.reload_utils()
         await self.reload_cogs()
 
     async def on_ready(self):
+        print("RADDADNADNE")
         self.build_db()
+        self.usage_counter.setup(self.guilds)
+        print("ready")
+        print(self.usage_counter)
 
     def reload_utils(self): 
 

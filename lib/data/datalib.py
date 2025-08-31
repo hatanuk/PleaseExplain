@@ -10,21 +10,47 @@ cur = con.cursor()
 
 # - PUBLIC -
 
+def fetch_config(guild_id):
+    return _records("SELECT Value, TypeID FROM ConfigDB WHERE GuildId = ?", guild_id)
+
+
 def set_monitoring(guild_id, on: bool):
     value = 1 if on else 0
-    _update_config(guild_id, "MonitoringOn", value)
+    _update_config(guild_id, "1", value)
 
+def is_monitoring_on(guild_id):
+    monitoring_on = _one_record("SELECT Value FROM ConfigDB WHERE GuildID = (?) AND TypeId = (?)", guild_id, 1) 
+
+    return True if monitoring_on == 1 else False
+
+def set_usage_count(guild_id, term, usage_count):
+    if usage_count:
+        _execute(f"UPDATE TermDB SET UsageCount = ? WHERE GuildId = ? AND TermName = ?", usage_count, guild_id, term)
+
+
+def increment_usage_count(guild_id, term):
+    usage_count = fetch_usage_count(guild_id, term)
+    if usage_count:
+       set_usage_count(guild_id, term, usage_count + 1)
+
+def fetch_usage_count(guild_id, term):
+    result = _fetch(["UsageCount"], "TermDB", guild_id)
+
+    if not result or result[0] == None:
+        return None
+    else:
+        return result[0]
 
 def fetch_all_terms(guild_id):
-    """Returns: [TermName, TermDefinition, CreatorID, CreatedAt, UpdatedAt, TermImage]"""
+    """Returns: [TermName, TermDefinition, CreatorID, CreatedAt, UpdatedAt, TermImage, UsageCount]"""
 
-    return _fetch(["TermName", "TermDefinition", "CreatorID", "CreatedAt", "UpdatedAt", "TermImage"], "TermDB", guild_id)
+    return _fetch(["TermName", "TermDefinition", "CreatorID", "CreatedAt", "UpdatedAt", "TermImage", "UsageCount"], "TermDB", guild_id)
 
 
 def fetch_term(guild_id, term):
-    """Returns: TermName, TermDefinition, CreatorID, CreatedAt, UpdatedAt, TermImage"""
+    """Returns: TermName, TermDefinition, CreatorID, CreatedAt, UpdatedAt, TermImage, UsageCount"""
 
-    result = _fetch(["TermName", "TermDefinition", "CreatorID", "CreatedAt", "UpdatedAt", "TermImage"], "TermDB",
+    result = _fetch(["TermName", "TermDefinition", "CreatorID", "CreatedAt", "UpdatedAt", "TermImage", "UsageCount"], "TermDB",
                     guild_id, term)
     if not result:
         return None
@@ -81,7 +107,14 @@ def clear_all_data(guild_id):
 # - PRIVATE - 
 
 def _update_config(guild_id, category, value):
-    _execute(f"UPDATE ConfigDB SET {category} = ? WHERE GuildId = ?", value, guild_id)
+    exists = _one_record("SELECT 1 FROM ConfigDB WHERE GuildId = ? AND TypeId = ?", guild_id, category)
+    if exists:
+        _execute(f"UPDATE ConfigDB SET Value = ? WHERE GuildId = ? AND TypeId = ?", value, guild_id, category)
+    else:
+        _execute(f"INSERT INTO ConfigDB (GuildId, TypeId, Value) VALUES (?, ?, ?)", guild_id, category, value)
+
+
+
 
 def _with_commit(func):
     def wrapper(*args, **kwargs):
@@ -113,7 +146,6 @@ def _one_record(command, *values):
 
 def _records(command, *values):
     cur.execute(command, tuple(values))
-
     return cur.fetchall()
 
 
@@ -181,6 +213,7 @@ def _fetch(values: list, database: str, guildid, termname=None, limit=9999):
     else:
         values = format_values(values)
 
+    
     if termname is not None:
         fetched = _records("SELECT %s FROM %s WHERE GuildID = (?) AND TermNameLower = (?) ORDER BY TermNameLower LIMIT %s" % (values, database, limit), guildid, termname.lower())
         if len(fetched) < 1:
@@ -217,7 +250,27 @@ def build(guild_ids):
     UsageCount integer
     );""".format("TermDB"))
 
+
+    # TYPE IDS:
+    # 1 - MonitoringOn (Value: 0 or 1)
     _execute("""CREATE TABLE IF NOT EXISTS {}(
     GuildID integer,
-    MonitoringOn bit
+    TypeID integer,
+    Value integer
     );""".format("ConfigDB"))
+
+
+def _insert_default_config(guild_id):
+
+    # Monitoring ON by default
+    _execute(
+        "INSERT INTO ConfigDB (GuildID, TypeID, Value) VALUES (?, ?, ?) ",
+        (guild_id, 1, 1)
+    )
+
+
+def on_guild_join(guild_id):
+    _insert_default_config(guild_id)
+
+def on_guild_remove(guild_id):
+    clear_all_data(guild_id)

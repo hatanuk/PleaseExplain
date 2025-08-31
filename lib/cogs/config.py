@@ -10,7 +10,7 @@ from lib.data.datalib import MAX_TERMS
 from lib.util.cache_helper import cache_image, uncache_image
 from lib.util.image_gen import create_def_image, create_dictionary_image
 from lib.util.validation import Validator
-from lib.util.embed_helper import create_def_embed, create_term_embed, create_dict_embed
+from lib.util.embed_helper import create_def_embed, create_term_embed, create_dict_embed, create_config_embed
 from lib.util.api_helper import get_user_from_id
 
 async def setup(bot):
@@ -35,6 +35,19 @@ class Config(commands.Cog):
         self.bot = bot
 
     @app_commands.command(
+        name="view_config",
+        description="displays the bot's configurations"
+    )
+    async def view_config(self, interaction: discord.Interaction):
+        results = db.fetch_config(interaction.guild.id) 
+
+        embed = create_config_embed(results)
+
+        await interaction.response.send_message(embed=embed)
+
+
+
+    @app_commands.command(
         name="usage_counting",
         description="allow or disallow messages to be monitored for counting usage of terms"
     )
@@ -47,27 +60,11 @@ class Config(commands.Cog):
         guild_id = interaction.guild_id
         if option.value == "on":
             db.set_monitoring(guild_id, on=True)
-            await interaction.response.send_message("usage counting is now  `ON`. i'll be listening.", ephemeral=True)
+            await interaction.response.send_message("usage counting is now `ON`. i'll be listening.", ephemeral=True)
         else:
             db.set_monitoring(guild_id, on=False)
-            await interaction.response.send_message("usage counting is now  `OFF`. didn't hear nothin'", ephemeral=True)
-    
-    @app_commands.command(
-        name="usage_counting",
-        description="allow or disallow messages to be monitored for counting usage of terms"
-    )
-    @app_commands.describe(option="turn usage counting 'on' or 'off'")
-    @app_commands.choices(option=[
-        app_commands.Choice(name="on", value="on"),
-        app_commands.Choice(name="off", value="off")
-    ])
-    async def usage_counting(self, interaction: discord.Interaction, option: app_commands.Choice[str]):
-        if option.value == "on":
-            await interaction.response.send_message("usage counting is now  `ON`. i'll be listening.", ephemeral=True)
-        else:
-            await interaction.response.send_message("Usage counting is now  `OFF `.", ephemeral=True)
-    
-
+            await interaction.response.send_message("usage counting is now `OFF`. didn't hear nothin'", ephemeral=True)
+ 
     @app_commands.command(
         name="clear_data",
         description="permanently removes data associated with the bot"

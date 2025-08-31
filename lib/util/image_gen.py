@@ -52,9 +52,8 @@ async def create_def_image(definition: str):
     image.save(OUTPUT_PATH)
 
 
-def create_dictionary_image(term, definition):
+def create_dictionary_image(term, definition, usage_count):
 
-    # Preparing phonetics
     phonetics = eng_to_ipa.convert(term)
 
     if "*" in list(phonetics):
@@ -74,7 +73,6 @@ def create_dictionary_image(term, definition):
     FONT_PATH = "lib/data/font_data/roboto/Roboto-Black.ttf"
     FONT_PATH_PHONETIC = "lib/data/font_data/phonetique-font/Phonetique-nRag.ttf"
 
-    # Create a new image with light blue background
     image = Image.new('RGB', (400, 300), (46, 103, 138))
     draw = ImageDraw.Draw(image)
 
@@ -83,16 +81,17 @@ def create_dictionary_image(term, definition):
     footer_font = ImageFont.truetype(FONT_PATH, 10)
     phonetic_font = ImageFont.truetype(FONT_PATH_PHONETIC, 20)
 
-    # Text colors
+    # text colors
     title_color = (77, 255, 253)  # light blue
     phonetics_color = (202, 207, 124)  # yellow
     text_color = (255, 255, 255)  # white
     footer_color = (255, 255, 255)  # white
+    counter_color = (255, 255, 255)  # white
 
-    # Draw the term
+    # drawing the term
     draw.text((20, 20), term, fill=title_color, font=title_font)
 
-    # Take out characters that are invisible in the phonetics font
+    # taking out characters that are invisible in the phonetics font
     phonetics = _clean_term(term)
 
     part_of_speech = get_part_of_speech(term)
@@ -102,17 +101,23 @@ def create_dictionary_image(term, definition):
         draw.text((25 + phonetic_font.getlength("[" + phonetics + "]"), 50), " |  " + part_of_speech, fill=phonetics_color,
               font=text_font)
 
-    # Wrap the definition text if it's too long
     wrapped_definition = textwrap.fill(definition, width=45)
 
-    # Draw the definition/
+    # drawing the definition/
     draw.text((20, 77), wrapped_definition, fill=text_color, font=text_font)
 
-    # Draw the flavor text
+    # drawing the flavor text
     draw.text((15, 250), choice(FLAVOR_TEXT), fill=footer_color, font=footer_font)
 
-    # Draw the footer
+    # drawing the footer
     draw.text((15, 275), "@ PleaseExplain", fill=footer_color, font=footer_font)
+
+    # drawing usage counter
+    print(usage_count)
+    if isinstance(usage_count, int):
+        usage_count_text = f"{usage_count:,}"
+        text_width = footer_font.getlength(usage_count_text)
+        draw.text((400 - (text_width + 25), 275), usage_count_text, fill=counter_color, font=footer_font)
 
     return image
 

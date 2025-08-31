@@ -24,6 +24,41 @@ class Base(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_guild_join(guild):
+        db.on_guild_join(guild.id)
+
+    @commands.Cog.listener()
+    async def on_guild_remove(guild):
+        db.on_guild_remove(guild.id)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        guild_id = message.guild.id
+
+        if not guild_id:
+            return
+
+        if not db.is_monitoring_on(guild_id):
+            return
+        
+        self.bot.usage_counter.to_refresh[guild_id] += 1
+
+        words = message.content.split()
+
+        for word in words:
+            print(word)
+            if word in self.bot.usage_counter.cache[guild_id].keys():
+                self.bot.usage_counter.cache[guild_id][word] += 1
+                print(f"yeah: {self.bot.usage_counter.cache[guild_id][word]}")
+                break
+        
+        if self.bot.usage_counter.to_refresh[guild_id] >= self.bot.usage_counter.REFRESH_RATE:
+            print("REFRESH")
+            self.bot.usage_counter.refresh(guild_id)
+
+        
+
     @app_commands.command(name="pleaseexplain", description="explains a term in the server's dictionary, if it exists")
     async def pleaseexplain(self, interaction: discord.Interaction, term: str):
 
@@ -36,13 +71,14 @@ class Base(commands.Cog):
                 "all available terms!")
             return
         
-        term, definition, creator_id, created_at, updated_at, image = result
+        term, definition, creator_id, created_at, updated_at, image, usage_count = result
+        print(f"usage_count: {usage_count}")
 
         creator = await get_user_from_id(interaction.client, creator_id)
         requestor = interaction.user
 
         # await create_def_image(term)
-        image = create_dictionary_image(term, definition)
+        image = create_dictionary_image(term, definition, usage_count)
         file, url = cache_image(image, interaction.guild.id, requestor.id)
         embed = create_def_embed(url, creator, requestor, created_at, updated_at)
         await interaction.response.send_message(embed=embed, file=file)
@@ -118,27 +154,6 @@ class Base(commands.Cog):
             await interaction.response.send_message(
                 "oh, uh, I couldn't remove it for whatever reason. please contact `akahunt` if you see this.")
 
-    @app_commands.command(name="pleaseexplainold", description="explains a definition found in the server's dictionary")
-    async def pleaseexplainold(self, interaction: discord.Interaction, term: str):
-
-        # Fetching and validating values
-        result = db.fetch_term(interaction.guild_id, term)
-        if result is None:
-            await interaction.response.send_message(
-                "sorry, I couldn't find a definition for that term in this server. \nplease do `/dictionary` to see "
-                "all server definitions!")
-            return
-
-        term, definition, creatorid, created_at, updated_at, image = result
-
-        # Preparing the values for presentation
-        creator = interaction.client.get_user(creatorid)
-        if creator is None:
-            creator = await interaction.client.fetch_user(creatorid)
-
-        # Creating embed
-        embed = create_term_embed(interaction, term, creatorid, created_at, updated_at, image)
-        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="dictionary", description="displays all the defined terms in the server")
     async def dictionary(self, interaction: discord.Interaction, page: int = 1):
