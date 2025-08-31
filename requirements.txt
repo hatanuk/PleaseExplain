@@ -2,3 +2,4 @@ packaging==24.2
 wheel
 discord.py
 Pillow
+eng_to_ipa
