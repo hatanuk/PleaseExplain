@@ -1,7 +1,7 @@
 # PleaseExplain
 
-Ever tried reading a Discord conversation before asking yourself, 'What the hell do these words even mean? What are they saying? Is this communication?"
-PleaseExplain is a Discord bot which offers a solution to this mayhem by allowing you to define certain words or phrases. 
+Ever tried reading a Discord conversation before asking yourself, 'What the hell do these words even mean? What are they saying? Is this communication?" \n
+PleaseExplain is a Discord bot which offers a solution to this mayhem by allowing you to define certain words or phrases. \n
 Now you don't need to be versed in seven layers of irony and inside jokes to participate in a regular conversion!
 
 ## App Commands
