@@ -6,6 +6,17 @@ PleaseExplain is a Discord bot which offers a solution to this mayhem by allowin
 
 Now you don't need to be versed in seven layers of irony and inside jokes to participate in a regular conversion!
 
+## Running the Bot
+
+The bot is currently hosted on DigitalOcean, and you can invite it to your server through this link:
+https://discord.com/oauth2/authorize?client_id=1128976599677665411
+However, note that I'm not planning to host it forever, and your data could be lost.
+
+Instead, feel free to clone this project, create an application and bot on the Discord Developer Portal, and paste the token in a .env file under the label TOKEN=
+You may also need to create a directory called database/ under which an SQLite database file will be created.
+Finally, just run main.py, and optionally set it as a system process to keep the bot always operational.
+
+
 ## App Commands
 
 `/pleaseexplain [term]`  
@@ -31,3 +42,5 @@ Permenantly removes certain type of data (usage, dictionary, etc.) held by the b
 
 `/view_config`  
 Displays the current configs you have saved for your server.  
+
+## 
