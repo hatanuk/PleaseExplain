@@ -32,5 +32,6 @@ Controls whether the bot reads messages to count the amount of times a term has 
 
 Permenantly removes certain type of data (usage, dictionary, etc.) held by the bot.  
 
-`/view_config`
+`/view_config`  
+
 Displays the current configs you have saved for your server.  
