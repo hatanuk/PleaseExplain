@@ -7,7 +7,7 @@ Now you don't need to be versed in seven layers of irony and inside jokes to par
 ## App Commands
 
 `/define [term] [definition]`
-Simple as it sounds. Associates a [term], which could be a word or phrase, with a specific definition. Feel free to include examples.
+Simple as it sounds. Associates a term, which could be a word or phrase, with a specific definition. Feel free to include examples.
 
 `/undefine [term]`
 Removes that term from the dictionary.
