@@ -8,6 +8,9 @@ Now you don't need to be versed in seven layers of irony and inside jokes to par
 
 ## App Commands
 
+`/pleaseexplain [term]`  
+Displays a beautiful, succinct explanation of a term, given that it has been defined by somebody.
+
 `/define [term] [definition]`  
 
 Simple as it sounds. Associates a term, which could be a word or phrase, with a specific definition. Feel free to include examples.  
