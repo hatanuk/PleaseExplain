@@ -8,7 +8,7 @@ Now you don't need to be versed in seven layers of irony and inside jokes to par
 
 ## Running the Bot
 
-The bot is currently hosted on DigitalOcean, and you can invite it to your server through this link:
+The bot is currently hosted on DigitalOcean, and you can invite it to your server through this link:  
 https://discord.com/oauth2/authorize?client_id=1128976599677665411
 However, note that I'm not planning to host it forever, and your data could be lost.
 
