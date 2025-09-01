@@ -14,7 +14,7 @@ However, note that I'm not planning to host it forever, and your data could be l
 
 Instead, feel free to clone this project, create an application and bot on the Discord Developer Portal, and paste the token in a .env file under the label TOKEN=  
 You may also need to create a directory called database/ under which an SQLite database file will be created.  
-Finally, just run main.py, and optionally set it as a system process to keep the bot always operational.  
+Finally, just run main.py, and optionally set it as a system process to keep the bot operational.  
 
 
 ## App Commands
