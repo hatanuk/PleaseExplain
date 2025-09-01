@@ -13,6 +13,7 @@ https://discord.com/oauth2/authorize?client_id=1128976599677665411
 However, note that I'm not planning to host it forever, and your data could be lost.  
 
 Instead, feel free to clone this project, create an application and bot on the Discord Developer Portal, and paste the token in a .env file under the label TOKEN=  
+Make sure to install the dependencies in requirements.txt.  
 You may also need to create a directory called database/ under which an SQLite database file will be created.  
 Finally, just run main.py, and optionally set it as a system process to keep the bot operational.  
 
